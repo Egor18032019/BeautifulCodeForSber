@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class CheckBracketsService {
 
     public boolean checkBrackets(String input) {
-        return checkOpenCloseBrackets(input) && checkTextBetweenBracketsPair(input);
+        return checkOpenCloseBrackets(input);
     }
 
     /**
@@ -28,6 +28,7 @@ public class CheckBracketsService {
         Stack<Character> stack = new Stack<>();
         boolean result = true;
         for (int i = 0; i < text.length(); i++) {
+
             char bracket = text.charAt(i);
             if (bracket == ')' || bracket == ']' || bracket == '}') {
                 if (stack.empty()) {
@@ -35,7 +36,7 @@ public class CheckBracketsService {
                     break;
                 }
                 if (bracket == ')' && stack.peek() == '(') {
-                    char prev = text.charAt(i - 1);
+
                     stack.pop();
                     continue;
                 }
@@ -50,11 +51,22 @@ public class CheckBracketsService {
                 result = false;
                 break;
             } else {
-
                 if (bracket == '(' || bracket == '[' || bracket == '{') {
+
+                    int q = i;
+                    var next = 'a';
+                    do {
+                        q++;
+                        next = text.charAt(q);
+                    }
+                    while (next == ' ');
+                    if (next == ')' || next == ']' || next == '}') {
+                        result = false;
+                        break;
+                    }
+
                     stack.push(bracket);
                 }
-
             }
         }
         if (!stack.empty()) {
@@ -63,27 +75,14 @@ public class CheckBracketsService {
         return result;
     }
 
-    /**
-     * Метод проверки текста между скобок
-     *
-     * @param text строка из запроса
-     * @return возвращает соответствие наличия текста между каждой открытой и закрытой скобкой
-     */
-    boolean checkTextBetweenBracketsPair(String text) {
-        Pattern pattern = Pattern.compile("\\(([^/S()][^ ]+)\\)");
-
-        Matcher matcher = pattern.matcher(text);
-
-        boolean hasTextBetweenBrackets = false;
-
-        while (matcher.find()) {
-            if (StringUtils.hasText(matcher.group(1))) {
-                hasTextBetweenBrackets = true;
-            } else {
-                return false;
-            }
+    boolean checkTextBetweenBrackets(String text, int iterator) {
+        var next = 'i';
+        do {
+            iterator++;
+            next = text.charAt(iterator);
         }
-        return hasTextBetweenBrackets;
+        while (next == ' ');
+        return next != ')' && next != ']' && next != '}';
     }
 }
 

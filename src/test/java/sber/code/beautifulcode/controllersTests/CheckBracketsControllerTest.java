@@ -20,7 +20,7 @@ public class CheckBracketsControllerTest extends AbstractRestControllerTest {
 
     @Test
     void checkCorrectBrackets() throws Exception {
-        CheckBracketsRequest request = new CheckBracketsRequest("Это (!) корректный случай (!) !");
+        CheckBracketsRequest request = new CheckBracketsRequest("Это (да) корректный случай (yes) !");
         perform(post(EndPoint.api + EndPoint.checkBrackets)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(request)))
@@ -43,6 +43,26 @@ public class CheckBracketsControllerTest extends AbstractRestControllerTest {
     @Test
     void checkIncorrectBracketsWithoutText() throws Exception {
         CheckBracketsRequest request = new CheckBracketsRequest("Это некорректный случай ! ()");
+        perform(post(EndPoint.api + EndPoint.checkBrackets)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(request)))
+                .andExpect(status().is(200))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.isCorrect").value("false"));
+    }
+    @Test
+    void checkIncorrectBracketsWithoutTextManyTime() throws Exception {
+        CheckBracketsRequest request = new CheckBracketsRequest("Это (да?) некорректный случай ! ()");
+        perform(post(EndPoint.api + EndPoint.checkBrackets)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(request)))
+                .andExpect(status().is(200))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.isCorrect").value("false"));
+    }
+    @Test
+    void checkIncorrectBracketsWithoutTextWhitWhitespace() throws Exception {
+        CheckBracketsRequest request = new CheckBracketsRequest("Это некорректный случай ! ( )");
         perform(post(EndPoint.api + EndPoint.checkBrackets)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(request)))
